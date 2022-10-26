@@ -1,0 +1,58 @@
+pipeline {
+    agent any 
+    environment {
+        registry = "386676070535.dkr.ecr.ca-central-1.amazonaws.com/myphpapp"
+        //- update your credentials ID after creating credentials for connecting to Docker Hub
+        registryCredential = 'ecr'
+        dockerImage = 'myphpapp'
+    }
+    
+    stages {
+        stage('Cloning Git') {
+            steps {
+                checkout([$class: 'GitSCM', branches: [[name: '*/master']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: '', url: 'https://github.com/AshishSarawad/php_app1.git']]])       
+            }
+        }
+    
+    // Building Docker images
+    stage('Building image') {
+      steps{
+        script {
+          dockerImage = docker.build registry
+            docker.build('myphpapp')
+        }
+      }
+    }
+    
+    
+     // Uploading Docker images into Docker Hub
+    stage('Upload Image') {
+     steps{    
+         script {
+            docker.withRegistry( 'https://386676070535.dkr.ecr.ca-central-1.amazonaws.com', "ecr:ca-central-1:$registryCredential" ) {
+            docker.image("myphpapp"). push('latest')
+            }
+        }
+      }
+    }
+    
+    
+     // Stopping Docker containers for cleaner Docker run
+     stage('docker stop container') {
+         steps {
+            sh 'docker ps -f name=myphpContainer -q | xargs --no-run-if-empty docker container stop'
+            sh 'docker container ls -a -fname=myphpContainer -q | xargs -r docker container rm'
+         }
+       }
+    
+    
+    // Running Docker container, make sure port 8096 is opened in 
+    stage('Docker Run') {
+     steps{
+         script {
+            dockerImage.run("-p 8096:5000 --rm --name myphpContainer")
+         }
+      }
+    }
+  }
+}

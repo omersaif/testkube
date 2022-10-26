@@ -12,7 +12,7 @@ spec:
         name: phpapp
     spec:
       containers:
-      - image: http://3.96.203.160:8082/myphpapp:1.13
+      - image: 130329173591.dkr.ecr.us-east-1.amazonaws.com/my-docker-repo:latest
         name: phpapp
         ports: 
         - name: phpapp

@@ -1,16 +1,15 @@
 pipeline {
     agent any 
     environment {
-        registry = "386676070535.dkr.ecr.ca-central-1.amazonaws.com/myphpapp"
-        //- update your credentials ID after creating credentials for connecting to Docker Hub
-        registryCredential = 'ecr'
-        dockerImage = 'myphpapp'
+        registry = "130329173591.dkr.ecr.us-east-1.amazonaws.com/my-docker-repo:latest"
+        
+       
     }
     
     stages {
         stage('Cloning Git') {
             steps {
-                checkout([$class: 'GitSCM', branches: [[name: '*/master']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: '', url: 'https://github.com/AshishSarawad/php_app1.git']]])       
+                checkout([$class: 'GitSCM', branches: [[name: '*/main']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: '', url: 'https://github.com/omersaif/testkube.git']]])       
             }
         }
     
@@ -29,7 +28,7 @@ pipeline {
     stage('Upload Image') {
      steps{    
          script {
-            docker.withRegistry( 'https://386676070535.dkr.ecr.ca-central-1.amazonaws.com', "ecr:ca-central-1:$registryCredential" ) {
+            docker.withRegistry( '130329173591.dkr.ecr.us-east-1.amazonaws.com/my-docker-repo:latest' ) {
             docker.image("myphpapp"). push('latest')
             }
         }
@@ -50,9 +49,10 @@ pipeline {
     stage('Docker Run') {
      steps{
          script {
-            dockerImage.run("-p 8096:5000 --rm --name myphpContainer")
+            dockerImage.run("-p 8096:5000 --rm --name myphpContainer 130329173591.dkr.ecr.us-east-1.amazonaws.com/my-docker-repo:latest")
          }
       }
     }
+    
   }
 }

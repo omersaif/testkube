@@ -34,7 +34,7 @@ spec:
 
       - name: php
 
-        image: 414026235762.dkr.ecr.us-west-1.amazonaws.com/php-app
+        image: 130329173591.dkr.ecr.us-east-1.amazonaws.com/my-docker-repo:latest
 
         ports:
 
